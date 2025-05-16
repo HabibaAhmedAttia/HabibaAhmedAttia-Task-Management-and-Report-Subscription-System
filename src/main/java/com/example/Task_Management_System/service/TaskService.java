@@ -18,6 +18,15 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     public Task createTask(TaskRequest request, String userEmail) {
+        if (request.getStartDate()==null)
+        {
+            request.setStartDate(LocalDate.now());
+        }
+        if (request.getDueDate()==null)
+        {
+            request.setDueDate(request.getStartDate().plusDays(3));
+        }
+
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "User not found"));
         Task task = Task.builder()
@@ -26,7 +35,7 @@ public class TaskService {
                 .startDate(request.getStartDate())
                 .dueDate(request.getDueDate())
                 .completionDate(request.getCompletionDate())
-                .status(request.getStatus())
+                .status(determineStatus(request))
                 .owner(user)
                 .build();
         return taskRepository.save(task);
@@ -54,12 +63,29 @@ public class TaskService {
         if (!task.getOwner().getEmail().equals(userEmail)) {
             throw new ResponseStatusException(FORBIDDEN, "Not authorized to update this task");
         }
-        task.setTitle(request.getTitle());
-        task.setDescription(request.getDescription());
-        task.setStartDate(request.getStartDate());
-        task.setDueDate(request.getDueDate());
-        task.setCompletionDate(request.getCompletionDate());
-        task.setStatus(request.getStatus());
+        if (request.getStartDate()==null)
+        {
+            request.setStartDate(LocalDate.now());
+        }
+        if (request.getDueDate()==null)
+        {
+            request.setDueDate(request.getStartDate().plusDays(3));
+        }if (request.getTitle() != null) {
+            task.setTitle(request.getTitle());
+        }
+        if (request.getDescription() != null) {
+            task.setDescription(request.getDescription());
+        }
+        if (request.getStartDate() != null) {
+            task.setStartDate(request.getStartDate());
+        }
+        if (request.getDueDate() != null) {
+            task.setDueDate(request.getDueDate());
+        }
+        if (request.getCompletionDate() != null) {
+            task.setCompletionDate(request.getCompletionDate());
+        }
+        task.setStatus(determineStatus(request));
         return taskRepository.save(task);
     }
     public void deleteTask(int id, String userEmail) {
@@ -83,5 +109,14 @@ public class TaskService {
         task.setDeleted(false);
         task.setDeletedAt(null);
         return taskRepository.save(task);
+    }
+    private Task.Status determineStatus(TaskRequest request) {
+        if (request.getCompletionDate() != null) {
+            return Task.Status.COMPLETED;
+        }
+        if (LocalDate.now().isAfter(request.getDueDate())) {
+            return Task.Status.OVERDUE;
+        }
+        return Task.Status.PENDING;
     }
 }

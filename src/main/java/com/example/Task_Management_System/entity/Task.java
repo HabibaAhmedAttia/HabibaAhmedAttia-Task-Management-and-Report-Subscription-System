@@ -18,10 +18,13 @@ public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @NotBlank(message = "Title must not be blank")
+    @Column(nullable = false)
     private String title;
+    //@Column(nullable = false)
     private String description;
+    //@Column(nullable = false)
     private LocalDate startDate;
+    //@Column(nullable = false)
     private LocalDate dueDate;
     private LocalDate completionDate;
     private boolean deleted = false;
