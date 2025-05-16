@@ -94,13 +94,23 @@ public class TaskService {
         if (!task.getOwner().getEmail().equals(userEmail)) {
             throw new ResponseStatusException(FORBIDDEN, "Not authorized to delete this task");
         }
+        else if (task.isDeleted()) {
+            throw new ResponseStatusException(BAD_REQUEST, "Task is already deleted");
+        }
         task.setDeleted(true);
         task.setDeletedAt(LocalDateTime.now());
         taskRepository.save(task);
     }
     public void deleteTasksInPeriod(LocalDate from, LocalDate to, String userEmail) {
         List<Task> tasks = getTasks(userEmail, Optional.empty(), Optional.of(from), Optional.of(to));
-        taskRepository.deleteAll(tasks);
+        if (tasks.isEmpty()) {
+            throw new ResponseStatusException(BAD_REQUEST, "No Tasks found in this period");
+        }
+        for (Task task : tasks) {
+            task.setDeleted(true);
+            task.setDeletedAt(LocalDateTime.now());
+        }
+        taskRepository.saveAll(tasks);
     }
     public Task restoreLastDeletedTask(String userEmail) {
         Task task = taskRepository.findTopByOwnerEmailAndDeletedTrueOrderByDeletedAtDesc(userEmail)
