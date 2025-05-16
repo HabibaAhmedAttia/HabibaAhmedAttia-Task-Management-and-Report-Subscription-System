@@ -12,23 +12,22 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationErrors(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ApiGenericResponse<Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error -> {
             errors.put(error.getField(), error.getDefaultMessage());
         });
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+        ApiGenericResponse<Object> response = ApiGenericResponse.error("Validation failed", errors);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
     @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<Map<String, String>> handleResponseStatusException(ResponseStatusException ex) {
-        Map<String, String> errors = new HashMap<>();
-        errors.put("message", ex.getReason());
-        return new ResponseEntity<>(errors, ex.getStatusCode());
+    public ResponseEntity<ApiGenericResponse<Object>> handleResponseStatusException(ResponseStatusException ex) {
+        ApiGenericResponse<Object> response = ApiGenericResponse.error(ex.getReason());
+        return new ResponseEntity<>(response, ex.getStatusCode());
     }
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Map<String, String>> handleInvalidDateFormat(HttpMessageNotReadableException ex) {
-        Map<String, String> error = new HashMap<>();
-        error.put("message", "Invalid date format. Please use yyyy-MM-dd.");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    public ResponseEntity<ApiGenericResponse<Object>> handleInvalidDateFormat(HttpMessageNotReadableException ex) {
+        ApiGenericResponse<Object> response = ApiGenericResponse.error("Invalid date format. Please use yyyy-MM-dd.");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 }
