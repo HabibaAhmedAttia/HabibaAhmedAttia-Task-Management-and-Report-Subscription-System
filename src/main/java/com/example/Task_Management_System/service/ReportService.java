@@ -6,6 +6,7 @@ import com.example.Task_Management_System.entity.User;
 import com.example.Task_Management_System.repository.SubscriptionRepository;
 import com.example.Task_Management_System.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -13,8 +14,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 @Service
 @RequiredArgsConstructor
@@ -25,26 +28,29 @@ public class ReportService {
     @Scheduled(cron = "0 0 * * * *")
     public void sendScheduledReports() {
         LocalDate now = LocalDate.now();
+        int currentHour = LocalTime.now().getHour();
         List<Subscription> subscriptions = subscriptionRepository.findAll();
         for (Subscription sub : subscriptions) {
+            if (sub.getReportHour().getHour() != currentHour) continue;
             LocalDate reportStartDate = switch (sub.getFrequency()) {
                 case DAILY -> now.minusDays(1);
                 case WEEKLY -> now.minusWeeks(1);
                 case MONTHLY -> now.minusMonths(1);
             };
-
             List<Task> tasks = taskRepository.findByOwnerAndDueDateBetweenAndDeletedFalse(
                     sub.getUser(), reportStartDate, now);
-            if (!tasks.isEmpty()) {
-                try {
-                    sendEmail(sub.getUser(), tasks);
-                } catch (MessagingException e) {
-                    e.printStackTrace();
+            try {
+                if (!tasks.isEmpty()) {
+                    sendTasksEmail(sub.getUser(), tasks);
+                } else {
+                    sendNoTasksEmail(sub.getUser());
                 }
+            } catch (MessagingException e) {
+                e.printStackTrace();
             }
         }
     }
-    private void sendEmail(User user, List<Task> tasks) throws MessagingException {
+    private void sendTasksEmail(User user, List<Task> tasks) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setTo(user.getEmail());
@@ -62,6 +68,16 @@ public class ReportService {
         }
         content.append("</table>");
         helper.setText(content.toString(), true);
+        mailSender.send(message);
+    }
+    private void sendNoTasksEmail(User user) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setTo(user.getEmail());
+        helper.setSubject("📋 Task Report - No Tasks Available");
+        String content = "<h2>Your Task Report</h2>" +
+                "<p>There are currently no tasks with due dates in your selected period.</p>";
+        helper.setText(content, true);
         mailSender.send(message);
     }
 }
