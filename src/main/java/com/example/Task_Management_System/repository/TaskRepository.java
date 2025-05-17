@@ -15,4 +15,5 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
     List<Task> findByOwnerAndStatusAndStartDateBetweenAndDeletedFalse(User owner, Task.Status status, LocalDate from, LocalDate to);
     Optional<Task> findById(int id);
     Optional<Task> findTopByOwnerEmailAndDeletedTrueOrderByDeletedAtDesc(String email);
+    List<Task> findByOwnerAndDueDateBetweenAndDeletedFalse(User user, LocalDate reportStartDate, LocalDate now);
 }

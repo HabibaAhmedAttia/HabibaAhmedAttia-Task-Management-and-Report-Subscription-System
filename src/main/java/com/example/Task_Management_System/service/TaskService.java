@@ -17,6 +17,8 @@ import static org.springframework.http.HttpStatus.*;
 public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final SubscriptionService subscriptionService;
+
     public Task createTask(TaskRequest request, String userEmail) {
         if (request.getStartDate()==null)
         {
@@ -26,7 +28,6 @@ public class TaskService {
         {
             request.setDueDate(request.getStartDate().plusDays(3));
         }
-
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "User not found"));
         Task task = Task.builder()
@@ -41,8 +42,12 @@ public class TaskService {
         return taskRepository.save(task);
     }
     public List<Task> getTasks(String userEmail, Optional<Task.Status> status, Optional<LocalDate> from, Optional<LocalDate> to) {
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "User not found"));
+        User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "User not found"));
+        List<Task> tasks=taskRepository.findByOwnerAndDeletedFalse(user);
+        if (tasks.isEmpty())
+        {
+            throw new ResponseStatusException(BAD_REQUEST, "No Active Tasks");
+        }
         if (status.isPresent() && from.isPresent() && to.isPresent()) {
             return taskRepository.findByOwnerAndStatusAndStartDateBetweenAndDeletedFalse(
                     user, status.get(), from.get(), to.get());
@@ -100,6 +105,7 @@ public class TaskService {
         task.setDeleted(true);
         task.setDeletedAt(LocalDateTime.now());
         taskRepository.save(task);
+        subscriptionService.checkAndDeleteSubscriptionIfNoActiveTasks(userEmail);
     }
     public void deleteTasksInPeriod(LocalDate from, LocalDate to, String userEmail) {
         List<Task> tasks = getTasks(userEmail, Optional.empty(), Optional.of(from), Optional.of(to));

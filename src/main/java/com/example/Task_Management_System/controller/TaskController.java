@@ -36,7 +36,6 @@ public class TaskController {
             @RequestParam Optional<Task.Status> status,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> to) {
-
         String email = authentication.getName();
         List<Task> tasks = taskService.getTasks(email, status, from, to);
         return ResponseEntity.ok(ApiGenericResponse.success("Tasks retrieved successfully", tasks));
