@@ -30,14 +30,8 @@ public class AuthService {
         userRepository.save(user);
     }
     public AuthResponse signIn(SignInRequest request) {
-//        System.out.println(">>> signIn() called with: " + request.getEmail());
-//        System.out.println(">>> Raw password: " + request.getPassword());
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
-//        System.out.println(">>> Encoded password in DB: " + user.getPassword());
-//        System.out.println(">>> Password match: " + passwordEncoder.matches(request.getPassword(), user.getPassword()));
-
-
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
         }

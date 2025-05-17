@@ -3,7 +3,6 @@ package com.example.Task_Management_System.controller;
 import com.example.Task_Management_System.dto.PagedResponse;
 import com.example.Task_Management_System.dto.TaskRequest;
 import com.example.Task_Management_System.entity.Task;
-import com.example.Task_Management_System.entity.User;
 import com.example.Task_Management_System.exception.ApiGenericResponse;
 import com.example.Task_Management_System.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,7 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 @RestController

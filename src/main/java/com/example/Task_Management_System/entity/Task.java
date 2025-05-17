@@ -1,7 +1,6 @@
 package com.example.Task_Management_System.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -20,11 +19,8 @@ public class Task {
     private int id;
     @Column(nullable = false)
     private String title;
-    //@Column(nullable = false)
     private String description;
-    //@Column(nullable = false)
     private LocalDate startDate;
-    //@Column(nullable = false)
     private LocalDate dueDate;
     private LocalDate completionDate;
     private boolean deleted = false;

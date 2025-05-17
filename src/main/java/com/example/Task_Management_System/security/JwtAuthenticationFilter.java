@@ -26,27 +26,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
-        //System.out.println(">>> Incoming request: " + request.getRequestURI());
-
         final String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            System.out.println("No Bearer token found");
             filterChain.doFilter(request, response);
             return;
         }
         String token = authHeader.substring(7);
-        String email = jwtUtil.getEmailFromToken(token);
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            User user = userRepository.findByEmail(email).orElse(null);
-            if (user != null && jwtUtil.validateToken(token)) {
-                System.out.println("Token validated and user authenticated");
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                user.getEmail(), null, null);
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+        try {
+            String email = jwtUtil.getEmailFromToken(token);
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                User user = userRepository.findByEmail(email).orElse(null);
+                if (user != null && jwtUtil.validateToken(token)) {
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    user.getEmail(), null, null);
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
         }
+        catch (io.jsonwebtoken.JwtException | IllegalArgumentException ex){}
         filterChain.doFilter(request, response);
     }
 }

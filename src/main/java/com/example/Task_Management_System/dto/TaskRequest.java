@@ -14,12 +14,9 @@ import java.time.LocalDate;
 public class TaskRequest {
     @NotBlank(message = "Title of task is required")
     private String title;
-    //@NotBlank(message = "Description of task is required")
     private String description;
-    //@NotNull(message = "StartDate of task is required")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate startDate;
-    //@NotNull(message = "Deadline of task is required")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dueDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
