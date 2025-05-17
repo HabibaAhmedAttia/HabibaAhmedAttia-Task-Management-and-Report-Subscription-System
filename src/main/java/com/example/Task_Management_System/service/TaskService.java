@@ -140,7 +140,6 @@ public class TaskService {
     public Task restoreLastDeletedTask(String userEmail) {
         Task task = taskRepository.findTopByOwnerEmailAndDeletedTrueOrderByDeletedAtDesc(userEmail)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "No deleted task found"));
-
         task.setDeleted(false);
         task.setDeletedAt(null);
         return taskRepository.save(task);

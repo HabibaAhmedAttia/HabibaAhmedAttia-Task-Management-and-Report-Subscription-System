@@ -65,10 +65,19 @@ public class TaskController {
     @Operation(summary = "Batch delete tasks in a date range", description = "Soft deletes all tasks for the authenticated user within the specified start and end date range.")
     @DeleteMapping("/batch")
     public ResponseEntity<ApiGenericResponse<Void>> deleteTasksInPeriod(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             Authentication authentication) {
-
+        if (from == null || to == null) {
+            return ResponseEntity.badRequest().body(
+                    ApiGenericResponse.error("Please specify both 'from' and 'to' dates")
+            );
+        }
+        if (from.isAfter(to)) {
+            return ResponseEntity.badRequest().body(
+                    ApiGenericResponse.error("'from' date must be before or equal to 'to' date")
+            );
+        }
         String email = authentication.getName();
         taskService.deleteTasksInPeriod(from, to, email);
         return ResponseEntity.ok(ApiGenericResponse.success("Tasks in the period deleted successfully", null));

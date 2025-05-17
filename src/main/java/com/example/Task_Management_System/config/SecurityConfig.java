@@ -1,6 +1,8 @@
 package com.example.Task_Management_System.config;
 
+import com.example.Task_Management_System.exception.ApiGenericResponse;
 import com.example.Task_Management_System.security.JwtAuthenticationFilter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +33,14 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
-                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+
+                            ApiGenericResponse<Object> errorResponse =
+                                    ApiGenericResponse.error("You are not authorized");
+
+                            ObjectMapper mapper = new ObjectMapper();
+                            mapper.writeValue(response.getOutputStream(), errorResponse);
                         })
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
