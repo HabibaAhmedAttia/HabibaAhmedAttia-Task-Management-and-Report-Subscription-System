@@ -5,6 +5,12 @@ import com.example.Task_Management_System.entity.User;
 import com.example.Task_Management_System.repository.TaskRepository;
 import com.example.Task_Management_System.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
@@ -41,13 +47,26 @@ public class TaskService {
                 .build();
         return taskRepository.save(task);
     }
-    public List<Task> getTasks(String userEmail, Optional<Task.Status> status, Optional<LocalDate> from, Optional<LocalDate> to) {
-        User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "User not found"));
-        List<Task> tasks=taskRepository.findByOwnerAndDeletedFalse(user);
-        if (tasks.isEmpty())
-        {
-            throw new ResponseStatusException(BAD_REQUEST, "No Active Tasks");
-        }
+    public Page<Task> getTasksWithPagination(String userEmail, Optional<Task.Status> status, Optional<LocalDate> from, Optional<LocalDate> to, int page) {
+    User user = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not authorized"));
+
+    Pageable pageable = PageRequest.of(page, 5, Sort.by("startDate").descending());
+
+    if (status.isPresent() && from.isPresent() && to.isPresent()) {
+        return taskRepository.findByOwnerAndStatusAndStartDateBetweenAndDeletedFalse(
+                user, status.get(), from.get(), to.get(), pageable);
+    } else if (status.isPresent()) {
+        return taskRepository.findByOwnerAndStatusAndDeletedFalse(user, status.get(), pageable);
+    } else if (from.isPresent() && to.isPresent()) {
+        return taskRepository.findByOwnerAndStartDateBetweenAndDeletedFalse(user, from.get(), to.get(), pageable);
+    } else {
+        return taskRepository.findByOwnerAndDeletedFalse(user, pageable);
+    }
+    }
+    public List<Task> getTasksWithoutPagination(String userEmail, Optional<Task.Status> status, Optional<LocalDate> from, Optional<LocalDate> to) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "User not found"));
         if (status.isPresent() && from.isPresent() && to.isPresent()) {
             return taskRepository.findByOwnerAndStatusAndStartDateBetweenAndDeletedFalse(
                     user, status.get(), from.get(), to.get());
@@ -108,7 +127,7 @@ public class TaskService {
         subscriptionService.checkAndDeleteSubscriptionIfNoActiveTasks(userEmail);
     }
     public void deleteTasksInPeriod(LocalDate from, LocalDate to, String userEmail) {
-        List<Task> tasks = getTasks(userEmail, Optional.empty(), Optional.of(from), Optional.of(to));
+        List<Task> tasks = getTasksWithoutPagination(userEmail, Optional.empty(), Optional.of(from), Optional.of(to));
         if (tasks.isEmpty()) {
             throw new ResponseStatusException(BAD_REQUEST, "No Tasks found in this period");
         }

@@ -1,12 +1,15 @@
 package com.example.Task_Management_System.controller;
 
+import com.example.Task_Management_System.dto.PagedResponse;
 import com.example.Task_Management_System.dto.TaskRequest;
 import com.example.Task_Management_System.entity.Task;
+import com.example.Task_Management_System.entity.User;
 import com.example.Task_Management_System.exception.ApiGenericResponse;
 import com.example.Task_Management_System.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -31,14 +34,17 @@ public class TaskController {
     }
     @Operation(summary = "Get tasks with optional filters", description = "Retrieves tasks for the authenticated user. You can optionally filter by status and/or a date range.")
     @GetMapping
-    public ResponseEntity<ApiGenericResponse<List<Task>>> getTasks(
+    public ResponseEntity<ApiGenericResponse<PagedResponse<Task>>> getTasks(
             Authentication authentication,
             @RequestParam Optional<Task.Status> status,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> from,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> to) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> to,
+            @RequestParam(defaultValue = "0") int page) {
+
         String email = authentication.getName();
-        List<Task> tasks = taskService.getTasks(email, status, from, to);
-        return ResponseEntity.ok(ApiGenericResponse.success("Tasks retrieved successfully", tasks));
+        Page<Task> tasksPage = taskService.getTasksWithPagination(email, status, from, to, page);
+        PagedResponse<Task> pagedResponse = new PagedResponse<>(tasksPage);
+        return ResponseEntity.ok(ApiGenericResponse.success("Tasks retrieved successfully", pagedResponse));
     }
     @Operation(summary = "Update a task by ID", description = "Updates a task by its ID if it belongs to the authenticated user and is not deleted. All fields are updated from the request body.")
     @PutMapping("/{id}")
