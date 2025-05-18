@@ -48,4 +48,27 @@ public class SubscriptionService {
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Subscription not found"));
         subscriptionRepository.delete(subscription);
     }
+    public Subscription updateSubscription(SubscriptionRequest request, String userEmail) {
+        User user = userRepository.findByEmail(userEmail).get();
+        Subscription subscription = subscriptionRepository.findByUser(user)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found"));
+        if (request.getFrequency() != null) {
+            subscription.setFrequency(request.getFrequency());
+        }
+        if (request.getStartDate() != null) {
+            if (request.getStartDate().isBefore(LocalDate.now())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Start date cannot be before today");
+            }
+            subscription.setStartDate(request.getStartDate());
+        }
+        if (request.getReportHour() != null) {
+            double rawHour = request.getReportHour();
+            int hour = (int) rawHour;
+            if (rawHour % 1 != 0 || hour < 0 || hour > 23) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Report hour must be a number between 0 and 23.");
+            }
+            subscription.setReportHour(LocalTime.of(hour, 0));
+        }
+        return subscriptionRepository.save(subscription);
+    }
 }

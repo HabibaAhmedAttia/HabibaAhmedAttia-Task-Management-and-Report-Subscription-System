@@ -60,4 +60,15 @@ public class SubscriptionController {
         ApiGenericResponse<Void> response = ApiGenericResponse.success("Unsubscribed successfully", null);
         return ResponseEntity.ok(response);
     }
+    @Operation(summary = "Update subscription", description = "Allows the authenticated user to partially update their subscription.")
+    @PutMapping
+    public ResponseEntity<ApiGenericResponse<Subscription>> updateSubscription(
+            @Valid @RequestBody SubscriptionRequest request,
+            Authentication authentication){
+        String email = authentication.getName();
+        Subscription updatedSubscription = subscriptionService.updateSubscription(request, email);
+        return ResponseEntity.ok(
+                ApiGenericResponse.success("Subscription updated successfully", updatedSubscription)
+        );
+    }
 }
