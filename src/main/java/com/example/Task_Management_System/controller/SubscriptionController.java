@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -23,7 +24,7 @@ public class SubscriptionController {
                     + "Reports include tasks with a due date in the selected period. The report will be sent to the user's email at the selected hour each day/week/month.")
     @PostMapping
     public ResponseEntity<ApiGenericResponse<Subscription>> subscribe(
-            @Valid @RequestBody SubscriptionRequest request,
+            @Validated(SubscriptionRequest.OnCreate.class) @RequestBody SubscriptionRequest request,
             Authentication authentication) {
         String email = authentication.getName();
         Subscription subscription = subscriptionService.subscribe(request, email);

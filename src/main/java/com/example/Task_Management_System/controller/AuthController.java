@@ -22,7 +22,7 @@ public class AuthController {
 
     @Operation(
             summary = "User sign-up",
-            description = "Register a new user account with full name, email, and password. Returns the saved user object."
+            description = "Register a new user account with full name, email, and password."
     )
     @PostMapping("/signup")
     public ResponseEntity<ApiGenericResponse<Object>> signUp(@Valid @RequestBody SignUpRequest request) {

@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -23,9 +24,9 @@ import java.util.Optional;
 public class TaskController {
     private final TaskService taskService;
 
-    @Operation(summary = "Create a new task", description = "Allows an authenticated user to create a new task by providing title, description, start and end dates, and status.")
+    @Operation(summary = "Create a new task", description = "Allows an authenticated user to create a new task by providing at least title.")
     @PostMapping
-    public ResponseEntity<ApiGenericResponse<Task>> createTask(@Valid @RequestBody TaskRequest request, Authentication authentication) {
+    public ResponseEntity<ApiGenericResponse<Task>> createTask(@Validated(TaskRequest.OnCreate.class) @RequestBody TaskRequest request, Authentication authentication) {
         String email = authentication.getName();
         Task task = taskService.createTask(request, email);
         return ResponseEntity.ok(ApiGenericResponse.success("Task created successfully", task));
@@ -42,7 +43,8 @@ public class TaskController {
         String email = authentication.getName();
         Page<Task> tasksPage = taskService.getTasksWithPagination(email, status, from, to, page);
         PagedResponse<Task> pagedResponse = new PagedResponse<>(tasksPage);
-        return ResponseEntity.ok(ApiGenericResponse.success("Tasks retrieved successfully", pagedResponse));
+        String message = tasksPage.isEmpty() ? "No tasks found" : "Tasks retrieved successfully";
+        return ResponseEntity.ok(ApiGenericResponse.success(message, pagedResponse));
     }
     @Operation(summary = "Update a task by ID", description = "Updates a task by its ID if it belongs to the authenticated user and is not deleted. All fields are updated from the request body.")
     @PutMapping("/{id}")

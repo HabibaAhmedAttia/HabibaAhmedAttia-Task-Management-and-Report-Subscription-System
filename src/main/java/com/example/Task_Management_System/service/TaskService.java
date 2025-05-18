@@ -80,6 +80,13 @@ public class TaskService {
         if (!task.getOwner().getEmail().equals(userEmail)) {
             throw new ResponseStatusException(FORBIDDEN, "Not authorized to update this task");
         }
+        if (request.getTitle() == null &&
+                request.getDescription() == null &&
+                request.getStartDate() == null &&
+                request.getDueDate() == null &&
+                request.getCompletionDate() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No updates provided");
+        }
         if (request.getStartDate()==null)
         {
             request.setStartDate(LocalDate.now());

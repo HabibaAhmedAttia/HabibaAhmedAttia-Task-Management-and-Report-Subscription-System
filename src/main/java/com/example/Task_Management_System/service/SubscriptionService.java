@@ -31,7 +31,7 @@ public class SubscriptionService {
         double rawHour = request.getReportHour();
         int hour = (int) rawHour;
         if (rawHour % 1 != 0||hour < 0 || hour > 23) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Report hour must be a number between 0 and 23.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Report hour must be an integer number between 0 and 23.");
         }
         LocalTime reportTime = LocalTime.of(hour, 0);
         Subscription subscription = Subscription.builder()
@@ -52,6 +52,10 @@ public class SubscriptionService {
         User user = userRepository.findByEmail(userEmail).get();
         Subscription subscription = subscriptionRepository.findByUser(user)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found"));
+        if (request.getStartDate()==null&&request.getFrequency()==null&&request.getReportHour()==null)
+        {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No updates provided");
+        }
         if (request.getFrequency() != null) {
             subscription.setFrequency(request.getFrequency());
         }

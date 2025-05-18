@@ -12,7 +12,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class TaskRequest {
-    @NotBlank(message = "Title of task is required")
+    public interface OnCreate {}
+    @NotBlank(message = "Title of task is required", groups = OnCreate.class)
     private String title;
     private String description;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
