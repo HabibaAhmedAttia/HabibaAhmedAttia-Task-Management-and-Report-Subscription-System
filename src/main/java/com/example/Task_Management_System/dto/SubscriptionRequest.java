@@ -20,5 +20,5 @@ public class SubscriptionRequest {
     @NotNull(message = "Report time is required")
     @Min(value = 0, message = "Hour must be between 0 and 23")
     @Max(value = 23, message = "Hour must be between 0 and 23")
-    private Integer reportHour;
+    private Double reportHour;
 }

@@ -28,12 +28,23 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ApiGenericResponse<Object>> handleResponseStatusException(ResponseStatusException ex) {
-        ApiGenericResponse<Object> response = ApiGenericResponse.error(ex.getReason());
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", ex.getReason());
+        ApiGenericResponse<Object> response = ApiGenericResponse.error(ex.getReason(),errors);
         return new ResponseEntity<>(response, ex.getStatusCode());
     }
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ApiGenericResponse<Object>> handleInvalidDateFormat(HttpMessageNotReadableException ex) {
-        ApiGenericResponse<Object> response = ApiGenericResponse.error("Invalid date format. Please use yyyy-MM-dd.");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    public ResponseEntity<ApiGenericResponse<Object>> handleInvalidFormat(HttpMessageNotReadableException ex) {
+        String msg = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
+        if (msg != null && msg.contains("Frequency")) {
+            return ResponseEntity.badRequest()
+                    .body(ApiGenericResponse.error("Invalid frequency value. Allowed values are: DAILY, WEEKLY, MONTHLY."));
+        }
+        if (msg != null && msg.contains("Date")) {
+            return ResponseEntity.badRequest()
+                    .body(ApiGenericResponse.error("Invalid date format. Please use yyyy-MM-dd."));
+        }
+        return ResponseEntity.badRequest()
+                .body(ApiGenericResponse.error("Invalid input format."));
     }
 }

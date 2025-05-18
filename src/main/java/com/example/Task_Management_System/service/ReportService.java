@@ -31,14 +31,24 @@ public class ReportService {
         int currentHour = LocalTime.now().getHour();
         List<Subscription> subscriptions = subscriptionRepository.findAll();
         for (Subscription sub : subscriptions) {
-            if (sub.getReportHour().getHour() != currentHour) continue;
-            LocalDate reportStartDate = switch (sub.getFrequency()) {
+            if (sub.getReportHour().getHour() != currentHour||now.isBefore(sub.getStartDate())) continue;
+            LocalDate periodStartDate = switch (sub.getFrequency()) {
                 case DAILY -> now.minusDays(1);
                 case WEEKLY -> now.minusWeeks(1);
                 case MONTHLY -> now.minusMonths(1);
             };
+            if (now.equals(sub.getStartDate())) {
+                periodStartDate = switch (sub.getFrequency()) {
+                    case DAILY -> sub.getStartDate().minusDays(1);
+                    case WEEKLY -> sub.getStartDate().minusWeeks(1);
+                    case MONTHLY -> sub.getStartDate().minusMonths(1);
+                };
+            }
+            if (periodStartDate.isBefore(sub.getStartDate())) {
+                periodStartDate = sub.getStartDate();
+            }
             List<Task> tasks = taskRepository.findByOwnerAndDueDateBetweenAndDeletedFalse(
-                    sub.getUser(), reportStartDate, now);
+                    sub.getUser(), periodStartDate, now);
             try {
                 if (!tasks.isEmpty()) {
                     sendTasksEmail(sub.getUser(), tasks);
