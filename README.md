@@ -162,4 +162,8 @@ This is a RESTful Task Management System built with Spring Boot. It allows users
   - Unauthorized access
   - Resource not found
   - Business logic violations (e.g., duplicate subscription)
+### 📊 ER Diagram
+
+![ER Diagram]
+<td><img src="APIs-Documentation/ERD.png" width="1000" height="600"/></td>
 
