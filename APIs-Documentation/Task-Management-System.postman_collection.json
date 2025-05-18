@@ -1,0 +1,411 @@
+{
+	"info": {
+		"_postman_id": "228eebd1-69f7-4daa-ba74-f0616f20683f",
+		"name": "Task-Management-System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26746354",
+		"_collection_link": "https://speeding-shadow-941982.postman.co/workspace/flutter~2e9b6ff6-9870-4fc1-9ec4-bd3c231f5e6a/collection/26746354-228eebd1-69f7-4daa-ba74-f0616f20683f?action=share&source=collection_link&creator=26746354"
+	},
+	"item": [
+		{
+			"name": "Authentication-APIs",
+			"item": [
+				{
+					"name": "SignUp",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"ahmed\",\r\n  \"email\": \"ahmed@example.com\",\r\n  \"password\": \"123456\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/auth/signup",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SignIn",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"habiba@example.com\",\r\n  \"password\": \"123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/auth/signin",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"auth",
+								"signin"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "TaskManagement-APIs",
+			"item": [
+				{
+					"name": "CreateTask",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb21heWFAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDczMDg0MTcsImV4cCI6MTc0NzM5NDgxN30.bZHQ1fNgMWBkSPAVc2n97CybId1YhEawXMv-H0Px1nY",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Study Spring Boot\",\r\n  \"description\": \"Review JPA and Spring Security\",\r\n  \"startDate\": \"2025-05-16\",\r\n  \"dueDate\": \"2025-05-20\",\r\n  \"completionDate\": null,\r\n  \"status\": \"PENDING\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/tasks",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"tasks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetTasks",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteTask",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb21heWFAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDczODM4NjAsImV4cCI6MTc0NzQ3MDI2MH0.EQGH6JwVJukwHGlGk7zHYt8ZosQ1njpaGpODlNufsZA",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/tasks/12",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"tasks",
+								"12"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateTask",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb21heWFAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDczMTM4MzgsImV4cCI6MTc0NzQwMDIzOH0.zK_9ClE2CnFxRCQ3xwpz0ut8DQgEd7rdrwPKjXRqFIQ",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Updated Task Title\",\r\n  \"description\": \"Updated description of the task\",\r\n  \"startDate\": \"2025-05-15\",\r\n  \"dueDate\": \"2025-05-20\",\r\n  \"completionDate\": \"2025-05-25\",\r\n  \"status\": \"OVERDUE\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/tasks/{2}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"tasks",
+								"{2}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteBatch",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb21heWFAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDczMjg0MDIsImV4cCI6MTc0NzQxNDgwMn0.BJ5iCYgmK1pPl8Ydb7vg3S-FJYOwes0nVVX47yEexxA",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/tasks/batch?from=2025-05-16&to=2025-05-19",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"tasks",
+								"batch"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "2025-05-16"
+								},
+								{
+									"key": "to",
+									"value": "2025-05-19"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "RestoreTask",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb21heWFAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDczMjkwOTMsImV4cCI6MTc0NzQxNTQ5M30.Q3bBTORaSKGvIAbZ8UOvV8-5C_aNCT4JgoqNa32Dp44",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/tasks/restore",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"tasks",
+								"restore"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ReportSubscription-APIs",
+			"item": [
+				{
+					"name": "Subscripe",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhaG1lZEBleGFtcGxlLmNvbSIsImlhdCI6MTc0NzU1MjMzNCwiZXhwIjoxNzQ3NjM4NzM0fQ.boArH0dnhVVBm1CRP_2-07rS-Vl5qejddE8ugL-Gc2Y",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"startDate\": \"2025-05-18\",\r\n  \"frequency\": \"WEEKLY\",\r\n  \"reportHour\": 2\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/subscription",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"subscription"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UnSubscripe",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer ",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/subscription",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"subscription"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GenerateReport",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhaG1lZEBleGFtcGxlLmNvbSIsImlhdCI6MTc0NzUxMDM4MCwiZXhwIjoxNzQ3NTk2NzgwfQ.2lgnJN956aLya68_jZMCrP_GgzfoPzCiGbyzr_byTZk",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/reports/test",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"reports",
+								"test"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateSubscription",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhaG1lZEBleGFtcGxlLmNvbSIsImlhdCI6MTc0NzU2NTQwOSwiZXhwIjoxNzQ3NjUxODA5fQ.YyQOEPZGbQlp_0M9QvOfA84bY0OhQmI4dWL6V2WBmmE",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"startDate\": \"2025-06-01\",\r\n  \"frequency\": \"MONTHLY\",\r\n  \"reportHour\": 9.0\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/subscription",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"subscription"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
