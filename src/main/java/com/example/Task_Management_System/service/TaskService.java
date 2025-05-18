@@ -32,8 +32,7 @@ public class TaskService {
         {
             request.setDueDate(request.getStartDate().plusDays(3));
         }
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "User not found"));
+        User user = userRepository.findByEmail(userEmail).get();
         Task task = Task.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
@@ -46,11 +45,8 @@ public class TaskService {
         return taskRepository.save(task);
     }
     public Page<Task> getTasksWithPagination(String userEmail, Optional<Task.Status> status, Optional<LocalDate> from, Optional<LocalDate> to, int page) {
-    User user = userRepository.findByEmail(userEmail)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not authorized"));
-
+    User user = userRepository.findByEmail(userEmail).get();
     Pageable pageable = PageRequest.of(page, 5, Sort.by("startDate").descending());
-
     if (status.isPresent() && from.isPresent() && to.isPresent()) {
         return taskRepository.findByOwnerAndStatusAndStartDateBetweenAndDeletedFalse(
                 user, status.get(), from.get(), to.get(), pageable);
@@ -63,8 +59,7 @@ public class TaskService {
     }
     }
     public List<Task> getTasksWithoutPagination(String userEmail, Optional<Task.Status> status, Optional<LocalDate> from, Optional<LocalDate> to) {
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "User not found"));
+        User user = userRepository.findByEmail(userEmail).get();
         if (status.isPresent() && from.isPresent() && to.isPresent()) {
             return taskRepository.findByOwnerAndStatusAndStartDateBetweenAndDeletedFalse(
                     user, status.get(), from.get(), to.get());
@@ -122,7 +117,6 @@ public class TaskService {
         task.setDeleted(true);
         task.setDeletedAt(LocalDateTime.now());
         taskRepository.save(task);
-        subscriptionService.checkAndDeleteSubscriptionIfNoActiveTasks(userEmail);
     }
     public void deleteTasksInPeriod(LocalDate from, LocalDate to, String userEmail) {
         List<Task> tasks = getTasksWithoutPagination(userEmail, Optional.empty(), Optional.of(from), Optional.of(to));

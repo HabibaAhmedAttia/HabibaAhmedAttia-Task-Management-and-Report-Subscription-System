@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("/api/subscription")
 @RequiredArgsConstructor
@@ -25,7 +27,27 @@ public class SubscriptionController {
             Authentication authentication) {
         String email = authentication.getName();
         Subscription subscription = subscriptionService.subscribe(request, email);
-        ApiGenericResponse<Subscription> response = ApiGenericResponse.success("Subscribed successfully", subscription);
+        LocalDate frequencyPeriodStartDate = switch (subscription.getFrequency()) {
+            case DAILY -> subscription.getStartDate().minusDays(1);
+            case WEEKLY -> subscription.getStartDate().minusWeeks(1);
+            case MONTHLY -> subscription.getStartDate().minusMonths(1);
+        };
+        if (frequencyPeriodStartDate.isBefore(subscription.getStartDate())) {
+            frequencyPeriodStartDate = subscription.getStartDate();
+        }
+        String frequencyWord=switch (subscription.getFrequency()) {
+            case DAILY -> frequencyWord = "day";
+            case WEEKLY -> frequencyWord = "week";
+            case MONTHLY -> frequencyWord = "month";
+        };
+        String detailedMessage = String.format(
+                "Subscribed successfully! Reports will be sent starting from %s at %02d:00 every %s.Including tasks with end date in the last %s",
+                subscription.getStartDate(),
+                subscription.getReportHour().getHour(),
+                frequencyWord,
+                frequencyWord
+        );
+        ApiGenericResponse<Subscription> response = ApiGenericResponse.success(detailedMessage, subscription);
         return ResponseEntity.ok(response);
     }
     @Operation(summary = "Unsubscribe from report generation",

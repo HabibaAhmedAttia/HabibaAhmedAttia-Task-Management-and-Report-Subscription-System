@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import java.util.Map;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -34,9 +35,9 @@ public class SecurityConfig {
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.setContentType("application/json");
-
+                            Map<String, String> errorDetails = Map.of("token", "Invalid token");
                             ApiGenericResponse<Object> errorResponse =
-                                    ApiGenericResponse.error("You are not authorized");
+                                    ApiGenericResponse.error("You are not authorized",errorDetails);
 
                             ObjectMapper mapper = new ObjectMapper();
                             mapper.writeValue(response.getOutputStream(), errorResponse);
